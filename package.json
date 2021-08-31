@@ -1,6 +1,6 @@
 {
   "name": "@lazydb_community/lazydb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "LazyDB client for NodeJS",
   "main": "index.js",
   "scripts": {
@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/LazyDB-community/LazyNode/issues"
   },
-  "homepage": "https://lazydb.com/"
+  "homepage": "https://lazydb.com/",
+  "dependencies": {
+    "websocket": "^1.0.34"
+  }
 }
