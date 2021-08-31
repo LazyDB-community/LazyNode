@@ -1,4 +1,4 @@
-class Database {
+module.exports = class {
     constructor(addr, port, onconnect = (e) => console.log("LazyDB is ready!"), onclose = (e) => console.log("LazyDB server lost!"), secure = true) {
         this.addr = addr;
         this.port = port;
@@ -15,8 +15,7 @@ class Database {
         }
 
         const W3CWebSocket = require('websocket').w3cwebsocket;
-        const client = new W3CWebSocket();
-        this.ws = new client(`ws${sec}://${addr}:${port}`);
+        this.ws = new W3CWebSocket(`ws${sec}://${addr}:${port}`, 'echo-protocol');
         this.ws.onopen = e => onconnect(e);
         this.ws.onclose = e => onclose(e);
         this.ws.onmessage = e => {
@@ -40,23 +39,25 @@ class Database {
         };
 
         this.sendQueue = function (self) {
-            if(self.messageQueue.length > 0 && (self.ws.readyState === WebSocket.OPEN)) {
+            if(self.messageQueue.length > 0 && self.ws.connected) {
                 self.ws.send(self.messageQueue.join("|"));
 
                 self.messageQueue = [];
             }
-        }
+        };
 
         setInterval(this.sendQueue, 100, this);
     };
 
     messageToJavascript(msg) {
-        return JSON.parse(msg.replaceAll(this.lazy_sep, "|"));
+        const reg = new RegExp(this.lazy_sep,"g");
+        return JSON.parse(msg.replace(reg, "|"));
     };
 
     javascriptToMessage(data) {
         const msg = JSON.stringify(data);
-        return msg.replaceAll("|", this.lazy_sep);
+        const reg = new RegExp("|","g");
+        return msg.replace(reg, this.lazy_sep);
     };
 
     send(name, args, fun = console.log) {
