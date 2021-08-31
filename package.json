@@ -1,0 +1,22 @@
+{
+  "name": "@lazydb_community/lazydb",
+  "version": "1.0.0",
+  "description": "LazyDB client for NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LazyDB-community/LazyNode.git"
+  },
+  "keywords": [
+    "lazydb"
+  ],
+  "author": "Victor Chanet - CTO at LazyDB",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LazyDB-community/LazyNode/issues"
+  },
+  "homepage": "https://lazydb.com/"
+}
