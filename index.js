@@ -1,5 +1,5 @@
 module.exports = class {
-    constructor(addr, port, onconnect = (e) => console.log("LazyDB is ready!"), onclose = (e) => console.log("LazyDB server lost!"), secure = true) {
+    constructor(addr, port, onconnect = (e) => console.log("LazyDB is ready!"), onclose = (e) => {console.log("LazyDB server lost!")}, secure = true) {
         this.addr = addr;
         this.port = port;
         this.id = 0;
@@ -15,11 +15,14 @@ module.exports = class {
         }
 
         const W3CWebSocket = require('websocket').w3cwebsocket;
-        this.ws = new W3CWebSocket(`ws${sec}://${addr}:${port}`, 'echo-protocol');
+        this.ws = new W3CWebSocket(`ws${sec}://${addr}:${port}`);
+        this.ws.onerror = function(error) {
+            console.log('Connection Error');
+        };
         this.ws.onopen = e => onconnect(e);
         this.ws.onclose = e => onclose(e);
         this.ws.onmessage = e => {
-            let messages = e.data.split("|")
+            let messages = e.data.split("|");
 
             for (let i = 0; i < messages.length; i++) {
                 const msg = messages[i];
@@ -39,9 +42,8 @@ module.exports = class {
         };
 
         this.sendQueue = function (self) {
-            if(self.messageQueue.length > 0 && self.ws.connected) {
+            if(self.messageQueue.length > 0 && (self.ws.readyState === self.ws.OPEN)) {
                 self.ws.send(self.messageQueue.join("|"));
-
                 self.messageQueue = [];
             }
         };
@@ -56,8 +58,7 @@ module.exports = class {
 
     javascriptToMessage(data) {
         const msg = JSON.stringify(data);
-        const reg = new RegExp("|","g");
-        return msg.replace(reg, this.lazy_sep);
+        return msg.replace(/\|[\d|]*/g, this.lazy_sep);
     };
 
     send(name, args, fun = console.log) {
@@ -83,10 +84,10 @@ module.exports = class {
 
             self.callbacks[id].resolve = resolve;
             self.callbacks[id].reject = reject;
-            if(name === "get" || name === "on" || name === "watch" || name === "size" || name === "sort") {
+            if(name === "on" || name === "watch" || name === "size" || name === "sort") {
                 self.callbacks[id].sync = fun;
             }
-        })
+        });
 
         this.messageQueue.push(message);
 
